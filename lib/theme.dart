@@ -8,8 +8,6 @@ class AppTheme {
 
   static final ThemeData themeData = ThemeData.dark().copyWith(
     colorScheme: colorScheme,
-    /*sliderTheme: SliderThemeData(
-
-    ),*/
+    
   );
 }
