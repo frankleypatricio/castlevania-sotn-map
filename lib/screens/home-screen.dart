@@ -59,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: IconButton(
+                    tooltip: '${_isTransparent ? 'Exibir' :'Esconder'} cor de fundo',
                     onPressed: (){
                       setState(() {
                         _backgroundColor = _isTransparent ? null : Colors.transparent;
@@ -76,20 +77,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               Positioned(
                 right: 15, bottom: 15,
                 child: Container(
-                  padding: const EdgeInsets.only(right: 8),
+                  padding: _userPrefs.expandirMenuCores ? const EdgeInsets.only(right: 8) : null,
                   decoration: BoxDecoration(
-                    color: _isTransparent ? null : Colors.white,
+                    color: _isTransparent ? Colors.white : null,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Row(
                     children: [
-                      Slider(
+                      if(_userPrefs.expandirMenuCores) Slider(
                         min: 0, max: 1,
                         value: _userPrefs.opacity,
                         onChanged: (value) => setState(() => _userPrefs.opacity = value),
                       ),
 
-                      IconButton(
+                      if(_userPrefs.expandirMenuCores) IconButton(
+                        tooltip: 'Alterar cor do mapa',
                         onPressed: () {
                           showDialog(
                             context: context,
@@ -129,6 +131,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         },
                         icon: Icon(
                           Icons.palette_rounded,
+                          color: AppTheme.colorScheme.primary,
+                        ),
+                      ),
+
+                      IconButton(
+                        tooltip: '${_userPrefs.expandirMenuCores ? 'Recolher' :'Expandir'} configurações de cores',
+                        onPressed: () {
+                          setState(() => _userPrefs.expandirMenuCores = !_userPrefs.expandirMenuCores);
+                        },
+                        icon: Icon(
+                          _userPrefs.expandirMenuCores ? Icons.menu_open_rounded : Icons.menu_rounded,
                           color: AppTheme.colorScheme.primary,
                         ),
                       ),

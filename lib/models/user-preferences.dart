@@ -10,6 +10,7 @@ class UserPreferences {
   double screenWidth = 1280, screenHeight = 720, opacity = .6;
   Color? mapColor;
   bool transparentScreen = false;
+  bool expandirMenuCores = true;
 
   void set(Map<String, dynamic> json) {
     screenWidth = json['screen-width'];
@@ -17,6 +18,7 @@ class UserPreferences {
     mapColor = json['map-color'] != null ? Color(json['map-color']) : null;
     opacity = json['opacity'];
     transparentScreen = json['transparent-screen'];
+    expandirMenuCores = json['expandir-menu-cores'];
   }
 
   void setSize(MediaQueryData mediaQuery) {
@@ -31,7 +33,6 @@ class UserPreferences {
     } else {
       await save();
     }
-    print('- load: ${toJson()}\n-----------------------------------');
   }
 
   Future<void> save() async {
@@ -39,7 +40,6 @@ class UserPreferences {
       _onProcessing = true;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_key, jsonEncode(toJson()));
-      print('- save: ${toJson()}\n-----------------------------------');
       _onProcessing = false;
     }
   }
@@ -51,6 +51,7 @@ class UserPreferences {
       'map-color': mapColor?.value,
       'opacity': opacity,
       'transparent-screen': transparentScreen,
+      'expandir-menu-cores': expandirMenuCores,
     };
   }
 }
