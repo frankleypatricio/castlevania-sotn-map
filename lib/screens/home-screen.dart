@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final UserPreferences _userPrefs;
-  Color _pickerColor = const Color(0xFFD54F4F);
+  late Color _pickerColor;
   Color? _backgroundColor;
 
   bool get _isTransparent => _backgroundColor != null;
@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _userPrefs = widget.userPrefs;
+    _pickerColor = _userPrefs.mapColor;
     _backgroundColor = _userPrefs.transparentScreen ? Colors.transparent : null;
   }
 
@@ -47,13 +48,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   height: double.maxFinite,
                   fit: BoxFit.fill,
                   opacity: AlwaysStoppedAnimation(_userPrefs.opacity),
-                  color: _userPrefs.mapColor,
+                  color: _userPrefs.showMap ? null : _userPrefs.mapColor,
                 ),
               ),
 
               Positioned(
                 top: 15, right: 15,
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.fastOutSlowIn,
+
                   decoration: BoxDecoration(
                     color: _isTransparent ? Colors.white : null,
                     borderRadius: BorderRadius.circular(30),
@@ -76,76 +80,90 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
               Positioned(
                 right: 15, bottom: 15,
-                child: Container(
-                  padding: _userPrefs.expandirMenuCores ? const EdgeInsets.only(right: 8) : null,
+                child: AnimatedContainer(
+                  width: _userPrefs.expandirMenu ? 325 : 40,
+                  duration: const Duration(milliseconds: 700),
+                  curve: Curves.fastOutSlowIn,
+
+                  padding: _userPrefs.expandirMenu ? const EdgeInsets.only(right: 8) : null,
                   decoration: BoxDecoration(
                     color: _isTransparent ? Colors.white : null,
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  child: Row(
-                    children: [
-                      if(_userPrefs.expandirMenuCores) Slider(
-                        min: 0, max: 1,
-                        value: _userPrefs.opacity,
-                        onChanged: (value) => setState(() => _userPrefs.opacity = value),
-                      ),
-
-                      if(_userPrefs.expandirMenuCores) IconButton(
-                        tooltip: 'Alterar cor do mapa',
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              content: SingleChildScrollView(
-                                child: ColorPicker(
-                                  enableAlpha: false,
-                                  pickerColor: _pickerColor,
-                                  onColorChanged: (value) => _pickerColor = value,
-                                ),
-                              ),
-                              actions: [
-                                ElevatedButton.icon(
-                                  icon: const Icon(Icons.cancel_rounded),
-                                  label: const Text('Cancelar'),
-                                  onPressed: () => Navigator.of(context).pop(),
-                                ),
-                                ElevatedButton.icon(
-                                  icon: const Icon(Icons.cleaning_services_rounded),
-                                  label: const Text('Limpar'),
-                                  onPressed: () {
-                                    setState(() => _userPrefs.mapColor = null);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                ElevatedButton.icon(
-                                  icon: const Icon(Icons.check_circle),
-                                  label: const Text('Selecionar'),
-                                  onPressed: () {
-                                    setState(() => _userPrefs.mapColor = _pickerColor);
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        if(_userPrefs.expandirMenu) Row(
+                          children: [
+                            Slider(
+                              min: 0, max: 1,
+                              value: _userPrefs.opacity,
+                              onChanged: (value) => setState(() => _userPrefs.opacity = value),
                             ),
-                          );
-                        },
-                        icon: Icon(
-                          Icons.palette_rounded,
-                          color: AppTheme.colorScheme.primary,
-                        ),
-                      ),
 
-                      IconButton(
-                        tooltip: '${_userPrefs.expandirMenuCores ? 'Recolher' :'Expandir'} configurações de cores',
-                        onPressed: () {
-                          setState(() => _userPrefs.expandirMenuCores = !_userPrefs.expandirMenuCores);
-                        },
-                        icon: Icon(
-                          _userPrefs.expandirMenuCores ? Icons.menu_open_rounded : Icons.menu_rounded,
-                          color: AppTheme.colorScheme.primary,
+                            IconButton(
+                              tooltip: '${_userPrefs.showMap ? 'Aplicar' : 'Remover'} cor no mapa',
+                              onPressed: () {
+                                setState(() => _userPrefs.showMap = !_userPrefs.showMap);
+                              },
+                              icon: Icon(
+                                _userPrefs.showMap ? Icons.map_rounded : Icons.map_outlined,
+                                color: AppTheme.colorScheme.primary,
+                              ),
+                            ),
+
+                            IconButton(
+                              tooltip: 'Alterar cor do mapa',
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    content: SingleChildScrollView(
+                                      child: ColorPicker(
+                                        enableAlpha: false,
+                                        pickerColor: _pickerColor,
+                                        onColorChanged: (value) => _pickerColor = value,
+                                      ),
+                                    ),
+                                    actions: [
+                                      ElevatedButton.icon(
+                                        icon: const Icon(Icons.cancel_rounded),
+                                        label: const Text('Cancelar'),
+                                        onPressed: () => Navigator.of(context).pop(),
+                                      ),
+                                      ElevatedButton.icon(
+                                        icon: const Icon(Icons.check_circle),
+                                        label: const Text('Selecionar'),
+                                        onPressed: () {
+                                          setState(() => _userPrefs.mapColor = _pickerColor);
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              icon: Icon(
+                                Icons.palette_rounded,
+                                color: AppTheme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+
+                        IconButton(
+                          tooltip: '${_userPrefs.expandirMenu ? 'Recolher' :'Expandir'} configurações de cores',
+                          onPressed: () {
+                            setState(() => _userPrefs.expandirMenu = !_userPrefs.expandirMenu);
+                          },
+                          icon: Icon(
+                            _userPrefs.expandirMenu ? Icons.menu_open_rounded : Icons.menu_rounded,
+                            color: AppTheme.colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

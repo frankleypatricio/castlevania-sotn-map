@@ -8,17 +8,19 @@ class UserPreferences {
   bool _onProcessing = false; // Indica se já está em processo de gravação
 
   double screenWidth = 1280, screenHeight = 720, opacity = .6;
-  Color? mapColor;
+  Color mapColor = const Color(0xFFD54F4F);
   bool transparentScreen = false;
-  bool expandirMenuCores = true;
+  bool expandirMenu = true;
+  bool showMap = true;
 
   void set(Map<String, dynamic> json) {
     screenWidth = json['screen-width'];
     screenHeight = json['screen-height'];
-    mapColor = json['map-color'] != null ? Color(json['map-color']) : null;
+    mapColor = Color(json['map-color']);
     opacity = json['opacity'];
     transparentScreen = json['transparent-screen'];
-    expandirMenuCores = json['expandir-menu-cores'];
+    expandirMenu = json['expandir-menu'] ;
+    showMap = json['show-map'];
   }
 
   void setSize(MediaQueryData mediaQuery) {
@@ -48,10 +50,11 @@ class UserPreferences {
     return {
       'screen-width': screenWidth,
       'screen-height': screenHeight,
-      'map-color': mapColor?.value,
+      'map-color': mapColor.value,
       'opacity': opacity,
       'transparent-screen': transparentScreen,
-      'expandir-menu-cores': expandirMenuCores,
+      'expandir-menu': expandirMenu,
+      'show-map': showMap,
     };
   }
 }
