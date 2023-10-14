@@ -16,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late final UserPreferences _userPrefs;
   late Color _pickerColor;
   Color? _backgroundColor;
+  int _rotateMap = 0;
 
   bool get _isTransparent => _backgroundColor != null;
 
@@ -42,13 +43,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           return Stack(
             children: [
               Center(
-                child: Image.asset(
-                  'assets/sotn_map.png',
-                  width: double.maxFinite,
-                  height: double.maxFinite,
-                  fit: BoxFit.fill,
-                  opacity: AlwaysStoppedAnimation(_userPrefs.opacity),
-                  color: _userPrefs.showMap ? null : _userPrefs.mapColor,
+                child: RotatedBox(
+                  quarterTurns: _rotateMap,
+                  child: Image.asset(
+                    'assets/sotn_map.png',
+                    width: double.maxFinite,
+                    height: double.maxFinite,
+                    fit: BoxFit.fill,
+                    opacity: AlwaysStoppedAnimation(_userPrefs.opacity),
+                    color: _userPrefs.showMap ? null : _userPrefs.mapColor,
+                  ),
                 ),
               ),
 
@@ -81,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               Positioned(
                 right: 15, bottom: 15,
                 child: AnimatedContainer(
-                  width: _userPrefs.expandirMenu ? 325 : 40,
+                  width: _userPrefs.expandirMenu ? 362 : 40, // +37 por cada botão
                   duration: const Duration(milliseconds: 700),
                   curve: Curves.fastOutSlowIn,
 
@@ -100,6 +104,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               min: 0, max: 1,
                               value: _userPrefs.opacity,
                               onChanged: (value) => setState(() => _userPrefs.opacity = value),
+                            ),
+
+                            IconButton(
+                              tooltip: 'Inverter mapa',
+                              onPressed: () {
+                                setState(() {
+                                  _rotateMap = _rotateMap == 0 ? 2 : 0;
+                                });
+                              },
+                              icon: Icon(
+                                Icons.rotate_left_rounded,
+                                color: AppTheme.colorScheme.primary,
+                              ),
                             ),
 
                             IconButton(
